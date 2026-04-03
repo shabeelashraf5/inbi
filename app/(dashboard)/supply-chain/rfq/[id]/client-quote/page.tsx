@@ -13,25 +13,18 @@ import {
   TrendingUp, 
   DollarSign, 
   Percent, 
-  Calculator, 
   ArrowRight, 
   CheckCircle2, 
   ShieldCheck, 
   FileText,
   Mail,
-  MoreVertical,
   Download,
-  Send,
   Loader2,
-  RefreshCcw,
-  Calendar as CalendarIcon,
-  Plus,
-  Trash2,
-  Building,
-  ArrowLeft,
-  ChevronRight,
   ShieldAlert,
-  Printer
+  Printer,
+  Truck,
+  Clock,
+  FileCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
@@ -57,10 +50,10 @@ export default function ClientQuotePage({ params }: { params: Promise<{ id: stri
   
   const [isFinalizing, setIsFinalizing] = useState(false);
   const [globalMarkup, setGlobalMarkup] = useState(25);
+  const [vatPercent] = useState(5);
   const [status, setStatus] = useState<'draft' | 'authorized'>('draft');
 
-  // Document Mock Data
-  const [clientDetails, setClientDetails] = useState({
+  const clientDetails = {
     rfqNumber: id,
     title: 'Dubai Metro Expansion - Phase 4 Structural Steel',
     client: 'Road & Transport Authority',
@@ -69,7 +62,26 @@ export default function ClientQuotePage({ params }: { params: Promise<{ id: stri
     priority: 'high',
     dueDate: '2026-04-12',
     notes: 'Uplifted pricing based on premium Grade A steel availability and accelerated shipping.'
-  });
+  };
+
+  // Selected supplier info (from previous step)
+  const selectedSupplier = {
+    name: 'Al Futtaim Steel Trading LLC',
+    contactPerson: 'Ahmad Al-Rashid',
+    email: 'quotes@alfuttaim-steel.ae',
+    deliveryDays: 14,
+    warranty: '12 Months',
+    paymentTerms: 'Net 30 Days',
+    incoterms: 'CIF Dubai Port',
+    validity: '30 Calendar Days',
+    conditions: [
+      'Material certificates (EN 10204 3.1) provided with each shipment',
+      'Partial deliveries accepted with prior written approval',
+      'Force majeure clause applies per ICC 2020 rules',
+      'Price validity subject to LME steel index fluctuation ±5%',
+      'Minimum order quantity applies per line item',
+    ]
+  };
 
   const [items, setItems] = useState<UpliftItem[]>([
     { id: '1', name: 'Structural Steel I-Beam (HEB 300)', quantity: 45, unit: 'pcs', supplierCost: 45.50, upliftPercent: 25, upliftAmount: 11.38, clientPrice: 56.88, totalAmount: 2559.60 },
@@ -83,7 +95,7 @@ export default function ClientQuotePage({ params }: { params: Promise<{ id: stri
       { label: 'Overview', href: '/dashboard' },
       { label: 'Supply Chain', href: '/supply-chain' },
       { label: id, href: `/supply-chain/rfq/${id}` },
-      { label: 'Strategic Client Quoting' },
+      { label: 'Client Quotation' },
     ]);
   }, [setActivePortal, setBreadcrumbs, id]);
 
@@ -92,13 +104,7 @@ export default function ClientQuotePage({ params }: { params: Promise<{ id: stri
       if (item.id === itemId) {
         const upliftAmount = (item.supplierCost * percent) / 100;
         const clientPrice = item.supplierCost + upliftAmount;
-        return {
-          ...item,
-          upliftPercent: percent,
-          upliftAmount,
-          clientPrice,
-          totalAmount: clientPrice * item.quantity
-        };
+        return { ...item, upliftPercent: percent, upliftAmount, clientPrice, totalAmount: clientPrice * item.quantity };
       }
       return item;
     }));
@@ -108,13 +114,7 @@ export default function ClientQuotePage({ params }: { params: Promise<{ id: stri
     setItems(items.map(item => {
       const upliftAmount = (item.supplierCost * globalMarkup) / 100;
       const clientPrice = item.supplierCost + upliftAmount;
-      return {
-        ...item,
-        upliftPercent: globalMarkup,
-        upliftAmount,
-        clientPrice,
-        totalAmount: clientPrice * item.quantity
-      };
+      return { ...item, upliftPercent: globalMarkup, upliftAmount, clientPrice, totalAmount: clientPrice * item.quantity };
     }));
     toast.success(`Global ${globalMarkup}% markup applied to all items`);
   };
@@ -125,277 +125,283 @@ export default function ClientQuotePage({ params }: { params: Promise<{ id: stri
     totalProfit: acc.totalProfit + (item.upliftAmount * item.quantity),
   }), { supplierTotal: 0, clientTotal: 0, totalProfit: 0 });
 
+  const vatAmount = totals.clientTotal * (vatPercent / 100);
+  const grandTotal = totals.clientTotal + vatAmount;
+
   const handleAuthorize = () => {
     setIsFinalizing(true);
     setTimeout(() => {
        setStatus('authorized');
        setIsFinalizing(false);
-       toast.success('Strategic Quotation Authorized & Locked');
+       toast.success('Quotation Authorized & Locked');
     }, 1500);
   };
 
   const handleCommitAndSend = () => {
     setIsFinalizing(true);
     setTimeout(() => {
-       toast.success('Quote Dispatched: Moving to Step 5 (Client PO)');
+       toast.success('Quote Dispatched — Moving to Client PO');
        router.push(`/supply-chain/rfq/${id}/client-po`);
     }, 2000);
   };
 
   return (
-    <div className="w-full space-y-12 pb-48 px-2 max-w-[1440px] animate-in fade-in duration-1000">
-      <div className="flex flex-col gap-6">
+    <div className="w-full space-y-6 pb-20 px-4 md:px-10 animate-in fade-in duration-700">
+      {/* Header & Timeline */}
+      <div className="flex flex-col gap-4">
         <PageHeader 
-          title="Strategic Client Quoting" 
-          description="Refine your commercial proposal by applying profit margins and finalizing terms for the end client." 
+          title="Client Quotation" 
+          description="Apply profit margins, review supplier terms, and finalize the commercial proposal for the end client." 
         />
-        <div className="bg-muted/10 rounded-[2.5rem] p-4 border border-border/50">
+        <div className="bg-muted/10 rounded-xl p-4 border border-border/50">
            <WorkflowTimeline currentStage={WorkflowStage.CLIENT_QUOTE} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 items-start">
-         <div className="lg:col-span-3 space-y-12">
-            {/* Strategy Control Deck */}
-            <section className="bg-primary/[0.03] border border-primary/20 rounded-[3rem] p-10 backdrop-blur-sm shadow-xl shadow-primary/[0.02] flex flex-col lg:flex-row items-center justify-between gap-12">
-               <div className="flex items-center gap-8">
-                  <div className="w-20 h-20 bg-primary/10 rounded-[2.2rem] flex items-center justify-center text-primary shadow-2xl shadow-primary/20 transition-all hover:scale-110">
-                     <TrendingUp size={36} />
-                  </div>
-                  <div>
-                     <h3 className="text-2xl font-black text-foreground tracking-tight">Active Uplift Strategy</h3>
-                     <p className="text-[11px] font-black uppercase text-primary tracking-[0.2em] mt-1 italic">Real-time Margin Optimization Active</p>
-                  </div>
+      {/* Margin Strategy Bar */}
+      <section className="bg-primary/[0.03] border border-primary/15 rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-5">
+         <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+               <TrendingUp size={20} />
+            </div>
+            <div>
+               <h3 className="text-base font-semibold text-foreground">Margin Strategy</h3>
+               <p className="text-xs text-muted-foreground">Apply markup across all line items</p>
+            </div>
+         </div>
+
+         <div className="flex flex-wrap items-center gap-6 bg-background/60 px-5 py-3 rounded-lg border border-border/40">
+            <div className="space-y-0.5">
+               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Supplier Cost</p>
+               <p className="text-base font-semibold text-foreground font-mono">${totals.supplierTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            </div>
+            <div className="h-8 w-px bg-border/50" />
+            <div className="space-y-0.5">
+               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Global Markup %</p>
+               <div className="flex items-center gap-2">
+                  <Input 
+                     type="number"
+                     value={globalMarkup}
+                     onChange={(e) => setGlobalMarkup(parseFloat(e.target.value) || 0)}
+                     className="h-8 w-16 px-2 font-semibold text-xs border-border/30 bg-background text-center"
+                  />
+                  <Button onClick={applyGlobalMarkup} size="sm" className="h-8 rounded-md px-3 text-xs font-semibold">Apply</Button>
                </div>
+            </div>
+            <div className="h-8 w-px bg-border/50" />
+            <div className="space-y-0.5 text-right">
+               <p className="text-[10px] font-semibold uppercase tracking-wider text-emerald-600">Net Profit</p>
+               <p className="text-base font-semibold text-emerald-600 font-mono">+${totals.totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            </div>
+         </div>
+      </section>
 
-               <div className="flex flex-wrap items-center gap-8 bg-background/50 p-6 rounded-[2.5rem] border border-border/50 shadow-inner">
-                  <div className="space-y-1">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Base Cost</p>
-                     <p className="text-xl font-black text-foreground">${totals.supplierTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                  </div>
-                  <div className="h-12 w-px bg-border/50" />
-                  <div className="space-y-1">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Global Markup</p>
-                     <div className="flex items-center gap-3">
-                        <Input 
-                           type="number"
-                           value={globalMarkup}
-                           onChange={(e) => setGlobalMarkup(parseFloat(e.target.value) || 0)}
-                           className="h-10 w-20 px-3 font-black text-sm border-transparent bg-primary/5 focus:bg-background transition-all"
-                        />
-                        <Button onClick={applyGlobalMarkup} size="sm" className="h-10 rounded-xl px-4 font-black uppercase tracking-widest text-[10px]">Apply</Button>
-                     </div>
-                  </div>
-                  <div className="h-12 w-px bg-border/50" />
-                  <div className="space-y-1 text-right">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Net Profit</p>
-                     <p className="text-xl font-black text-emerald-600">+${totals.totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-                  </div>
+      {/* ===== Quotation Document — Full Width ===== */}
+      <div className="bg-background border border-border/40 shadow-lg rounded-xl overflow-hidden p-8 relative animate-in slide-in-from-bottom-4 duration-500">
+         {/* Watermark */}
+         <div className="absolute top-6 right-16 rotate-12 opacity-[0.03] pointer-events-none">
+            <FileText size={160} className="text-primary" />
+         </div>
+
+         {status === 'authorized' && (
+            <div className="absolute top-8 right-8 z-20 animate-in zoom-in-50 duration-500">
+               <div className="w-28 h-28 border-4 border-emerald-500 rounded-full flex flex-col items-center justify-center text-emerald-600 font-bold uppercase text-sm leading-none rotate-[-15deg] opacity-60">
+                  <span>Authorized</span>
+                  <span className="text-[9px] mt-1 tracking-wider font-mono">INBI-QUO-944</span>
                </div>
-            </section>
+            </div>
+         )}
 
-            {/* The Quotation Document (A4 Frame) */}
-            <div className="bg-background border border-border/40 shadow-[0_45px_120px_-25px_rgba(0,0,0,0.15)] rounded-[4rem] overflow-hidden p-16 md:p-24 relative animate-in slide-in-from-bottom-8 duration-700">
-               {/* Document Watermark Seal */}
-               <div className="absolute top-24 right-24 rotate-12 opacity-5 pointer-events-none">
-                  <FileText size={250} className="text-primary" />
+         {/* Letterhead */}
+         <div className="flex flex-col md:flex-row justify-between items-start gap-6 mb-8 border-b border-border/30 pb-6">
+            <div className="space-y-4">
+               <div className="w-24 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm italic tracking-tight">INBI</div>
+               <div className="space-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40">From:</p>
+                  <h4 className="text-sm font-semibold text-foreground">INBI Technical Solutions LLC</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Suite 405, Business Bay Tower,<br/>Dubai, UAE &bull; TRN: 100994401200003</p>
                </div>
-
-               {status === 'authorized' && (
-                  <div className="absolute top-12 right-12 z-20 animate-in zoom-in-50 duration-500">
-                     <div className="w-44 h-44 border-8 border-emerald-500 rounded-full flex flex-col items-center justify-center text-emerald-600 font-black uppercase text-xl leading-none rotate-[-15deg] opacity-70">
-                        <span>Authorized</span>
-                        <span className="text-[10px] mt-1 tracking-widest">INBI-QUO-944</span>
-                     </div>
-                  </div>
-               )}
-
-               {/* Letterhead Header */}
-               <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-24 border-b border-border/40 pb-16">
-                  <div className="space-y-6">
-                     <div className="w-32 h-16 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground font-black text-2xl italic tracking-tighter">INBI</div>
-                     <div className="space-y-1">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">From:</p>
-                        <h4 className="text-sm font-black text-foreground">INBI Technical Solutions LLC</h4>
-                        <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[300px]">Suite 405, Business Bay Tower,<br/>Dubai, UAE • TRN: 100994401200003</p>
-                     </div>
-                  </div>
-                  <div className="text-right space-y-4">
-                     <h2 className="text-5xl font-black text-foreground tracking-tighter uppercase italic leading-none">Quotation</h2>
-                     <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Reference Ref:</p>
-                        <p className="text-xl font-black text-primary font-mono tracking-tighter uppercase">{id}</p>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase opacity-50">Valid Until: {clientDetails.dueDate}</p>
-                     </div>
-                  </div>
-               </div>
-
-               {/* Stakeholder Details */}
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
-                  <div className="space-y-4 px-2">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-primary">To: (The Client)</p>
-                     <div className="space-y-1">
-                        <h4 className="text-xl font-black text-foreground uppercase tracking-tight">{clientDetails.client}</h4>
-                        <p className="text-xs font-semibold text-muted-foreground">{clientDetails.address}</p>
-                        <p className="text-[10px] font-black text-primary mt-4 flex items-center gap-2">
-                           <Mail size={12} /> {clientDetails.clientEmail}
-                        </p>
-                     </div>
-                  </div>
-                  <div className="p-8 bg-muted/20 border border-border/50 rounded-3xl space-y-4">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Opportunity Mapping</p>
-                     <div className="space-y-1">
-                        <h4 className="text-sm font-black text-foreground leading-snug">{clientDetails.title}</h4>
-                        <div className="flex items-center gap-3 mt-4">
-                           <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-100">Grade A Priority</span>
-                           <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Project ID: DXB-LT-2026</span>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-
-               {/* High-Density Matrix Table */}
-               <div className="mb-24 overflow-hidden rounded-3xl border border-border/40">
-                  <table className="w-full">
-                     <thead>
-                        <tr className="bg-muted/30 h-16 border-b border-border/50">
-                           <th className="text-left px-10 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Product Specification</th>
-                           <th className="text-center px-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 w-32">Qty</th>
-                           <th className="text-center px-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 w-40">Uplift (%)</th>
-                           <th className="text-right px-10 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Quoted Total</th>
-                        </tr>
-                     </thead>
-                     <tbody>
-                        {items.map((item, idx) => (
-                           <tr key={item.id} className="h-24 border-b border-border/20 last:border-0 hover:bg-primary/[0.01] group transition-colors">
-                              <td className="px-10">
-                                 <div className="space-y-1">
-                                    <p className="text-sm font-black text-foreground uppercase truncate max-w-[300px]">{item.name}</p>
-                                    <p className="text-[9px] font-mono text-muted-foreground/40 group-hover:text-primary transition-colors">SKU Ref: IN-PRO-0{idx}9-L</p>
-                                 </div>
-                              </td>
-                              <td className="text-center">
-                                 <span className="font-bold text-xs text-muted-foreground">{item.quantity} {item.unit}</span>
-                              </td>
-                              <td className="px-4">
-                                 <div className="flex items-center gap-2 justify-center">
-                                    <Input 
-                                       type="number"
-                                       value={item.upliftPercent}
-                                       disabled={status === 'authorized'}
-                                       onChange={(e) => updateItemUplift(item.id, parseFloat(e.target.value) || 0)}
-                                       className="h-10 w-20 text-center font-black text-xs border-transparent bg-primary/5 focus:bg-background"
-                                    />
-                                    <Percent size={12} className="text-primary/40" />
-                                 </div>
-                              </td>
-                              <td className="px-10 text-right">
-                                 <div className="flex flex-col items-end gap-1">
-                                    <span className="text-lg font-black text-foreground italic">${item.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                                    <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">GP +${(item.upliftAmount * item.quantity).toLocaleString()}</span>
-                                 </div>
-                              </td>
-                           </tr>
-                        ))}
-                     </tbody>
-                  </table>
-               </div>
-
-               {/* Commercial Recap Footer */}
-               <div className="flex flex-col md:flex-row justify-between items-end gap-16 pt-16 border-t-2 border-dashed border-border/50">
-                  <div className="space-y-6 max-w-sm">
-                     <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">Commercial Affirmations</h4>
-                     <p className="text-[10px] text-muted-foreground leading-relaxed italic">
-                        "The proposed pricing includes accelerated warehousing intake and premium batch verification for Grade S355JR structural elements."
-                     </p>
-                     <div className="flex items-center gap-6">
-                        <div className="space-y-1">
-                           <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Validity Period</p>
-                           <p className="text-xs font-black text-foreground">30 Calendar Days</p>
-                        </div>
-                        <div className="space-y-1">
-                           <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Incoterms</p>
-                           <p className="text-xs font-black text-foreground">CIF Dubai Port</p>
-                        </div>
-                     </div>
-                  </div>
-                  
-                  <div className="w-full md:w-96 space-y-6">
-                     <div className="bg-muted/10 p-10 rounded-[3rem] border border-border/40 space-y-6">
-                        <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
-                           <span>Total Document Value</span>
-                           <span className="font-mono text-xs">${totals.clientTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                        </div>
-                        <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-[0.2em] text-primary">
-                           <span>Authorized Quote Total</span>
-                           <span className="text-4xl font-black text-foreground tracking-tighter italic leading-none">${totals.clientTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
-                        </div>
-                     </div>
-                  </div>
+            </div>
+            <div className="text-right space-y-3">
+               <h2 className="text-xl font-bold text-foreground tracking-tight uppercase">Quotation</h2>
+               <div className="space-y-0.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40">Reference:</p>
+                  <p className="text-base font-semibold text-primary font-mono">{id}</p>
+                  <p className="text-xs text-muted-foreground">Valid Until: {clientDetails.dueDate}</p>
                </div>
             </div>
          </div>
 
-         {/* Final Action Sidebar */}
-         <div className="space-y-8 sticky top-12 animate-in slide-in-from-right-8 duration-700">
-            <Card className="border-primary/20 bg-primary/[0.01] rounded-[2.5rem] shadow-2xl overflow-hidden">
-               <div className="p-8 bg-primary/5 border-b border-primary/10 flex items-center justify-between">
-                  <h4 className="text-lg font-black text-foreground tracking-tight">Strategy Control</h4>
-                  <ShieldCheck size={20} className={cn(status === 'authorized' ? "text-emerald-500" : "text-muted-foreground/20")} />
+         {/* Client & Project Info */}
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="space-y-2">
+               <p className="text-[10px] font-semibold uppercase tracking-wider text-primary">To: (The Client)</p>
+               <h4 className="text-base font-semibold text-foreground">{clientDetails.client}</h4>
+               <p className="text-xs text-muted-foreground">{clientDetails.address}</p>
+               <p className="text-xs text-primary flex items-center gap-1.5 mt-1">
+                  <Mail size={11} /> {clientDetails.clientEmail}
+               </p>
+            </div>
+            <div className="p-4 bg-muted/15 border border-border/40 rounded-lg space-y-2">
+               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Project</p>
+               <h4 className="text-sm font-semibold text-foreground leading-snug">{clientDetails.title}</h4>
+               <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">Grade A Priority</span>
+            </div>
+            <div className="p-4 bg-muted/15 border border-border/40 rounded-lg space-y-2">
+               <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/50">Selected Supplier</p>
+               <h4 className="text-sm font-semibold text-foreground">{selectedSupplier.name}</h4>
+               <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Clock size={11} /> {selectedSupplier.deliveryDays} days</span>
+                  <span className="flex items-center gap-1"><ShieldCheck size={11} /> {selectedSupplier.warranty}</span>
                </div>
-               <CardContent className="p-8 space-y-8">
-                  <div className="space-y-6">
-                     <div className="flex items-center gap-4 p-4 bg-background/50 rounded-2xl border border-border/40 group hover:border-primary/30 transition-all cursor-pointer">
-                        <div className="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                           <Download size={18} />
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest">Internal P&L Draft</span>
-                     </div>
-                     <div className="flex items-center gap-4 p-4 bg-background/50 rounded-2xl border border-border/40 group hover:border-blue-500/30 transition-all cursor-pointer">
-                        <div className="w-10 h-10 bg-blue-500/5 rounded-xl flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                           <Printer size={18} />
-                        </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest">Print Review</span>
-                     </div>
-                  </div>
+            </div>
+         </div>
 
-                  <Separator className="bg-border/50" />
-
-                  <div className="space-y-4">
-                     <Button 
-                        onClick={handleAuthorize}
-                        disabled={status === 'authorized' || isFinalizing}
-                        variant={status === 'authorized' ? "outline" : "default"}
-                        className="w-full h-16 rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl group"
-                     >
-                        {status === 'authorized' ? <><CheckCircle2 size={16} className="mr-2 text-emerald-500" /> Authorized</> : isFinalizing ? <Loader2 className="animate-spin" /> : 'Authorize Pricing Seal'}
-                     </Button>
-
-                     <Button 
-                        onClick={handleCommitAndSend}
-                        disabled={status !== 'authorized' || isFinalizing}
-                        className="w-full h-24 rounded-[2.5rem] bg-foreground text-background font-black text-lg uppercase tracking-[0.25em] transition-all hover:bg-foreground/90 disabled:opacity-20"
-                     >
-                        {isFinalizing ? <Loader2 className="animate-spin" /> : (
-                           <div className="flex flex-col items-center">
-                              <span className="text-[9px] mb-1 opacity-50">Global Action</span>
-                              <span className="flex items-center gap-4 italic font-black">Commit & Send <ArrowRight size={24} /></span>
+         {/* Line Items Table */}
+         <div className="mb-6 overflow-hidden rounded-lg border border-border/40">
+            <table className="w-full">
+               <thead>
+                  <tr className="bg-muted/30 h-10 border-b border-border/40">
+                     <th className="text-left px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60">Item Description</th>
+                     <th className="text-center px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 w-16">Qty</th>
+                     <th className="text-right px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 w-28">Unit Cost</th>
+                     <th className="text-center px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 w-24">Markup %</th>
+                     <th className="text-right px-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 w-28">Unit Price</th>
+                     <th className="text-right px-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 w-32">Line Total</th>
+                  </tr>
+               </thead>
+               <tbody>
+                  {items.map((item, idx) => (
+                     <tr key={item.id} className="h-12 border-b border-border/20 last:border-0 hover:bg-muted/5 group transition-colors">
+                        <td className="px-4">
+                           <p className="text-sm font-medium text-foreground">{item.name}</p>
+                           <p className="text-[10px] font-mono text-muted-foreground/40">SKU: IN-PRO-0{idx}9-L</p>
+                        </td>
+                        <td className="text-center px-3">
+                           <span className="text-xs font-medium text-muted-foreground">{item.quantity} {item.unit}</span>
+                        </td>
+                        <td className="text-right px-3">
+                           <span className="text-xs font-mono text-muted-foreground">${item.supplierCost.toFixed(2)}</span>
+                        </td>
+                        <td className="px-3">
+                           <div className="flex items-center gap-1 justify-center">
+                              <Input 
+                                 type="number"
+                                 value={item.upliftPercent}
+                                 disabled={status === 'authorized'}
+                                 onChange={(e) => updateItemUplift(item.id, parseFloat(e.target.value) || 0)}
+                                 className="h-8 w-16 text-center font-medium text-xs border-border/30 bg-primary/5 focus:bg-background"
+                              />
+                              <Percent size={10} className="text-muted-foreground/40" />
                            </div>
-                        )}
-                     </Button>
-                  </div>
+                        </td>
+                        <td className="text-right px-3">
+                           <span className="text-xs font-semibold text-foreground font-mono">${item.clientPrice.toFixed(2)}</span>
+                        </td>
+                        <td className="px-4 text-right">
+                           <span className="text-sm font-semibold text-foreground font-mono">${item.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                           <p className="text-[10px] text-emerald-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">GP +${(item.upliftAmount * item.quantity).toFixed(2)}</p>
+                        </td>
+                     </tr>
+                  ))}
+               </tbody>
+            </table>
+         </div>
 
-                  <div className="pt-4 p-6 bg-muted border border-border/50 rounded-[2rem]">
-                     <div className="flex items-center gap-3 mb-4">
-                        <ShieldAlert size={16} className="text-primary/40" />
-                        <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 leading-tight">Price Lock Affirmation Engine</span>
-                     </div>
-                     <p className="text-[9px] text-muted-foreground/40 uppercase tracking-widest leading-relaxed text-center">
-                        Committing will generate the official Quote PDF and notify the client contact.
-                     </p>
+         {/* Totals & Terms Footer */}
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6 border-t border-border/30">
+            {/* Terms & Conditions */}
+            <div className="space-y-4">
+               <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground/70">Supplier Terms & Conditions</h4>
+               <ul className="space-y-2">
+                  {selectedSupplier.conditions.map((condition, idx) => (
+                     <li key={idx} className="flex items-start gap-2 text-xs text-muted-foreground leading-relaxed">
+                        <FileCheck size={12} className="text-primary/40 mt-0.5 shrink-0" />
+                        {condition}
+                     </li>
+                  ))}
+               </ul>
+               <Separator className="bg-border/30" />
+               <div className="flex flex-wrap gap-x-8 gap-y-2">
+                  <div className="space-y-0.5">
+                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40">Payment Terms</p>
+                     <p className="text-xs font-medium text-foreground">{selectedSupplier.paymentTerms}</p>
                   </div>
-               </CardContent>
-            </Card>
+                  <div className="space-y-0.5">
+                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40">Incoterms</p>
+                     <p className="text-xs font-medium text-foreground">{selectedSupplier.incoterms}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40">Validity</p>
+                     <p className="text-xs font-medium text-foreground">{selectedSupplier.validity}</p>
+                  </div>
+                  <div className="space-y-0.5">
+                     <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/40">Delivery</p>
+                     <p className="text-xs font-medium text-foreground">{selectedSupplier.deliveryDays} Business Days</p>
+                  </div>
+               </div>
+            </div>
+
+            {/* Financial Summary */}
+            <div className="flex flex-col justify-end">
+               <div className="bg-muted/10 p-5 rounded-lg border border-border/30 space-y-3">
+                  <div className="flex justify-between items-center text-xs text-muted-foreground">
+                     <span className="font-medium">Subtotal (excl. VAT)</span>
+                     <span className="font-mono font-semibold">${totals.clientTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-muted-foreground">
+                     <span className="font-medium">VAT ({vatPercent}%)</span>
+                     <span className="font-mono font-semibold">${vatAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <Separator className="bg-border/40" />
+                  <div className="flex justify-between items-center">
+                     <span className="text-xs font-semibold uppercase tracking-wider text-primary">Grand Total (incl. VAT)</span>
+                     <span className="text-lg font-bold text-foreground font-mono">${grandTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs text-emerald-600">
+                     <span className="font-medium">Your Gross Profit</span>
+                     <span className="font-mono font-semibold">+${totals.totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      {/* ===== Action Bar — Full Width Below Document ===== */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-muted/20 border border-border/40 rounded-xl">
+         <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+               <Button variant="outline" size="sm" className="h-9 rounded-lg text-xs font-medium gap-2">
+                  <Download size={14} /> Export Draft
+               </Button>
+               <Button variant="outline" size="sm" className="h-9 rounded-lg text-xs font-medium gap-2">
+                  <Printer size={14} /> Print Preview
+               </Button>
+            </div>
+            <Separator orientation="vertical" className="h-6" />
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground/50">
+               <ShieldAlert size={12} />
+               <span>Committing will generate the official PDF and notify the client.</span>
+            </div>
+         </div>
+         
+         <div className="flex items-center gap-3">
+            <Button 
+               onClick={handleAuthorize}
+               disabled={status === 'authorized' || isFinalizing}
+               variant={status === 'authorized' ? "outline" : "default"}
+               className="h-9 rounded-lg font-semibold text-xs gap-2"
+            >
+               {status === 'authorized' ? <><CheckCircle2 size={14} className="text-emerald-500" /> Authorized</> : isFinalizing ? <Loader2 size={14} className="animate-spin" /> : 'Authorize Pricing'}
+            </Button>
+
+            <Button 
+               onClick={handleCommitAndSend}
+               disabled={status !== 'authorized' || isFinalizing}
+               className="h-9 rounded-lg bg-foreground text-background font-semibold text-xs gap-2 hover:bg-foreground/90 disabled:opacity-30"
+            >
+               {isFinalizing ? <Loader2 size={14} className="animate-spin" /> : <>Commit & Send <ArrowRight size={14} /></>}
+            </Button>
          </div>
       </div>
     </div>

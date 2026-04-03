@@ -71,267 +71,241 @@ export default function DeliveryPage({ params }: { params: Promise<{ id: string 
   };
 
   return (
-    <div className="w-full space-y-12 pb-48 px-2 max-w-[1440px] animate-in fade-in duration-1000">
-      <div className="flex flex-col gap-6">
+    <div className="w-full space-y-8 pb-32 px-4 md:px-10 animate-in fade-in duration-700">
+      <div className="flex flex-col gap-4">
         <PageHeader 
           title="Logistics Dispatch (DN)" 
           description="Authenticate outbound transitions, select fleet carriers, and mobilize the official Delivery Note." 
         />
-        <div className="bg-muted/10 rounded-[2.5rem] p-4 border border-border/50">
+        <div className="bg-muted/10 rounded-xl p-2 border border-border/50">
            <WorkflowTimeline currentStage={WorkflowStage.DELIVERY} />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-         <div className="lg:col-span-8 xl:col-span-9 space-y-12">
-            {/* Fleet Intelligence Selection */}
-            <section className="space-y-6">
-               <div className="flex items-center gap-3 px-6">
-                  <div className="w-1.5 h-6 bg-primary rounded-full" />
-                  <h2 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/70">1. Fleet Intelligence Strategy</h2>
-               </div>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <Card 
-                     onClick={() => setFleetType('internal')}
-                     className={cn(
-                        "cursor-pointer transition-all duration-500 rounded-[2.5rem] border-2 group relative overflow-hidden",
-                        fleetType === 'internal' ? "border-primary bg-primary/[0.02]" : "border-border/40 bg-background/50 grayscale hover:grayscale-0"
-                     )}
-                  >
-                     <CardContent className="p-10 space-y-6">
-                        <div className={cn(
-                           "w-16 h-16 rounded-[1.8rem] flex items-center justify-center transition-all duration-500 shadow-xl",
-                           fleetType === 'internal' ? "bg-primary text-primary-foreground scale-110 shadow-primary/20" : "bg-muted/50 text-muted-foreground"
-                        )}>
-                           <Navigation size={32} />
-                        </div>
-                        <div>
-                           <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Internal Dispatch</h3>
-                           <p className="text-xs text-muted-foreground font-medium mt-2 leading-relaxed">Utilize INBI Fleet Cluster for local site offloading. Optimized for Deira/Metro Project zones.</p>
-                        </div>
-                        <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-primary">
-                           8 Units Active <span className="opacity-20">•</span> Multi-Route GPS
-                        </div>
-                     </CardContent>
-                     {fleetType === 'internal' && <div className="absolute top-8 right-8 text-primary animate-in zoom-in-50"><CheckCircle size={28} /></div>}
-                  </Card>
-
-                  <Card 
-                     onClick={() => setFleetType('external')}
-                     className={cn(
-                        "cursor-pointer transition-all duration-500 rounded-[2.5rem] border-2 group relative overflow-hidden",
-                        fleetType === 'external' ? "border-primary bg-primary/[0.02]" : "border-border/40 bg-background/50 grayscale hover:grayscale-0"
-                     )}
-                  >
-                     <CardContent className="p-10 space-y-6">
-                        <div className={cn(
-                           "w-16 h-16 rounded-[1.8rem] flex items-center justify-center transition-all duration-500 shadow-xl",
-                           fleetType === 'external' ? "bg-blue-600 text-white scale-110 shadow-blue-500/20" : "bg-muted/50 text-muted-foreground"
-                        )}>
-                           <Globe size={32} />
-                        </div>
-                        <div>
-                           <h3 className="text-xl font-black text-foreground uppercase tracking-tight">Carrier API Link</h3>
-                           <p className="text-xs text-muted-foreground font-medium mt-2 leading-relaxed">Integrated dispatch via Global Carriers (DHL/Aramex) for cross-city logistics nodes.</p>
-                        </div>
-                        <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-blue-600">
-                           Fulfillment Ready <span className="opacity-20">•</span> Automated Waybill
-                        </div>
-                     </CardContent>
-                     {fleetType === 'external' && <div className="absolute top-8 right-8 text-blue-600 animate-in zoom-in-50"><CheckCircle size={28} /></div>}
-                  </Card>
-               </div>
-            </section>
-
-            {/* The Delivery Note Document (A4 Frame) */}
-            <div className="bg-background border border-border/40 shadow-[0_45px_120px_-25px_rgba(0,0,0,0.15)] rounded-[4rem] overflow-hidden p-16 md:p-24 relative animate-in slide-in-from-bottom-8 duration-700">
-               {/* Document Header */}
-               <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-24 border-b border-border/40 pb-16">
-                  <div className="space-y-6">
-                     <div className="w-24 h-12 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-black text-xl italic tracking-tighter">INBI</div>
-                     <div className="space-y-1">
-                        <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">From Ops Hub:</p>
-                        <h4 className="text-sm font-black text-foreground">Delivery Note (DN)</h4>
-                        <p className="text-[10px] text-muted-foreground uppercase opacity-50 tracking-widest">Outbound Dispatch Phase 8.0</p>
+      <div className="space-y-8">
+         {/* Fleet Intelligence Selection */}
+         <section className="space-y-4">
+            <div className="flex items-center gap-2 px-2">
+               <div className="w-1 h-4 bg-primary rounded-full" />
+               <h2 className="text-xs font-bold uppercase tracking-wider text-foreground/70">1. Fleet Intelligence Strategy</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <Card 
+                  onClick={() => setFleetType('internal')}
+                  className={cn(
+                     "cursor-pointer transition-all duration-300 rounded-xl border-2 group relative overflow-hidden",
+                     fleetType === 'internal' ? "border-primary bg-primary/[0.02]" : "border-border/40 bg-background/50 hover:border-primary/20"
+                  )}
+               >
+                  <CardContent className="p-6 space-y-4">
+                     <div className={cn(
+                        "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm",
+                        fleetType === 'internal' ? "bg-primary text-primary-foreground shadow-primary/20" : "bg-muted/50 text-muted-foreground"
+                     )}>
+                        <Navigation size={24} />
                      </div>
-                  </div>
-                  <div className="text-right space-y-4">
-                     <h2 className="text-4xl font-black text-foreground tracking-tighter uppercase leading-none italic">Dispatch Mobilized</h2>
-                     <div className="space-y-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Shipment Ref:</p>
-                        <p className="text-xl font-black text-primary font-mono tracking-tighter uppercase">{id}</p>
-                        <p className="text-[10px] font-bold text-muted-foreground opacity-50 uppercase">Service Date: April 03, 2026</p>
+                     <div>
+                        <h4 className="text-base font-bold text-foreground uppercase tracking-tight">Internal Dispatch</h4>
+                        <p className="text-[11px] text-muted-foreground font-medium mt-1 leading-relaxed">INBI Fleet Cluster for local site offloading. Optimized for Deira/Metro Project zones.</p>
                      </div>
+                     <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-wider text-primary">
+                        8 Units Active <span className="opacity-20">•</span> Multi-Route GPS
+                     </div>
+                  </CardContent>
+                  {fleetType === 'internal' && <div className="absolute top-6 right-6 text-primary animate-in zoom-in-50"><CheckCircle size={20} /></div>}
+               </Card>
+
+               <Card 
+                  onClick={() => setFleetType('external')}
+                  className={cn(
+                     "cursor-pointer transition-all duration-300 rounded-xl border-2 group relative overflow-hidden",
+                     fleetType === 'external' ? "border-primary bg-primary/[0.02]" : "border-border/40 bg-background/50 hover:border-primary/20"
+                  )}
+               >
+                  <CardContent className="p-6 space-y-4">
+                     <div className={cn(
+                        "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm",
+                        fleetType === 'external' ? "bg-blue-600 text-white shadow-blue-500/20" : "bg-muted/50 text-muted-foreground"
+                     )}>
+                        <Globe size={24} />
+                     </div>
+                     <div>
+                        <h4 className="text-base font-bold text-foreground uppercase tracking-tight">Carrier API Link</h4>
+                        <p className="text-[11px] text-muted-foreground font-medium mt-1 leading-relaxed">Integrated dispatch via Global Carriers (DHL/Aramex) for cross-city logistics nodes.</p>
+                     </div>
+                     <div className="flex items-center gap-3 text-[9px] font-bold uppercase tracking-wider text-blue-600">
+                        Fulfillment Ready <span className="opacity-20">•</span> Waybill API
+                     </div>
+                  </CardContent>
+                  {fleetType === 'external' && <div className="absolute top-6 right-6 text-blue-600 animate-in zoom-in-50"><CheckCircle size={20} /></div>}
+               </Card>
+            </div>
+         </section>
+
+         {/* The Delivery Note Document (A4 Frame) */}
+         <div className="bg-background border border-border/40 shadow-xl rounded-2xl overflow-hidden p-12 md:p-16 relative animate-in slide-in-from-bottom-8 duration-700">
+            {/* Document Header */}
+            <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-16 border-b border-border/40 pb-8">
+               <div className="space-y-4">
+                  <div className="w-20 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-lg italic tracking-tighter">INBI</div>
+                  <div className="space-y-0.5">
+                     <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/40">From Ops Hub:</p>
+                     <h4 className="text-sm font-bold text-foreground">Delivery Note (DN)</h4>
+                     <p className="text-[9px] text-muted-foreground uppercase opacity-50 tracking-wider">Outbound Dispatch Phase 8.0</p>
                   </div>
                </div>
-
-               {/* Recipient Details */}
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-24 mb-24">
-                  <div className="space-y-6">
-                     <p className="text-[10px] font-black uppercase tracking-widest text-primary">Consignee Address</p>
-                     <div className="space-y-2">
-                        <h4 className="text-lg font-black text-foreground uppercase tracking-tight">Road & Transport Authority</h4>
-                        <p className="text-xs font-semibold text-muted-foreground leading-relaxed italic max-w-[280px]">Site Office 22, Al Jaddaf Extension,<br/>Adjacent to Business Bay Link,<br/>Dubai, UAE</p>
-                     </div>
-                  </div>
-                  <div className="p-10 bg-primary/[0.03] border border-primary/20 rounded-[3rem] space-y-6">
-                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-xl shadow-primary/5">
-                           <Clock size={24} />
-                        </div>
-                        <div>
-                           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Transit Estimated</p>
-                           <p className="text-sm font-black text-foreground italic">Today, Approx 17:45 GST</p>
-                        </div>
-                     </div>
-                     <Separator className="bg-primary/20 opacity-30" />
-                     <div className="flex items-center gap-4">
-                        <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-xl shadow-primary/5">
-                           <Truck size={24} />
-                        </div>
-                        <div>
-                           <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Fleet Node</p>
-                           <p className="text-sm font-black text-foreground italic">AE-LOG-944-G</p>
-                        </div>
-                     </div>
+               <div className="text-right space-y-2">
+                  <h2 className="text-3xl font-bold text-foreground tracking-tighter uppercase leading-none italic">Dispatch Mobilized</h2>
+                  <div className="space-y-0.5">
+                     <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/40">Shipment Ref:</p>
+                     <p className="text-lg font-bold text-primary font-mono tracking-tighter uppercase">{id}</p>
+                     <p className="text-[9px] font-bold text-muted-foreground opacity-50 uppercase tracking-widest italic">Service Date: April 03, 2026</p>
                   </div>
                </div>
+            </div>
 
-               {/* Transit Simulation Deck */}
-               <div className="mb-24 relative h-64 bg-muted/10 rounded-[3rem] border border-border/40 overflow-hidden flex items-center justify-center group">
-                  <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-                  
-                  <div className="relative w-full max-w-2xl h-1 border-t-2 border-dashed border-primary/20 flex justify-between items-center px-12">
-                     <div className="relative">
-                        <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center outline outline-8 outline-white shadow-2xl">
-                           <MapPin size={24} className="text-primary" />
-                        </div>
-                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">Warehouse</span>
-                     </div>
-                     
-                     <div className="relative animate-in slide-in-from-left-[10%] duration-[15000ms] infinite">
-                        <div className="p-4 bg-primary rounded-2xl shadow-2xl shadow-primary/30 text-white flex flex-col items-center gap-1">
-                           <Truck size={28} className="animate-pulse" />
-                           <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-2xl border border-border/40 shadow-xl whitespace-nowrap">
-                              <span className="text-[9px] font-black text-primary uppercase tracking-[0.2em] italic">In Transit (AE-LOG-944)</span>
-                           </div>
-                        </div>
-                     </div>
-
-                     <div className="relative">
-                        <div className="w-12 h-12 bg-muted/60 rounded-full flex items-center justify-center outline outline-8 outline-white shadow-sm">
-                           <MapPin size={24} className="text-muted-foreground/30" />
-                        </div>
-                        <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase tracking-widest text-muted-foreground/50">Site (DXB-M4)</span>
-                     </div>
+            {/* Recipient Details */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
+               <div className="space-y-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-primary">Consignee Address</p>
+                  <div className="space-y-1">
+                     <h4 className="text-base font-bold text-foreground uppercase tracking-tight">Road & Transport Authority</h4>
+                     <p className="text-[11px] font-semibold text-muted-foreground leading-relaxed italic max-w-[280px]">Site Office 22, Al Jaddaf Extension,<br/>Adjacent to Business Bay Link,<br/>Dubai, UAE</p>
                   </div>
                </div>
-
-               {/* Recipient Affirmation Block */}
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-24 pt-16 border-t-2 border-dashed border-border/50 items-end">
-                  <div className="space-y-8">
-                     <div className="flex items-center gap-3">
-                        <QrCode size={24} className="text-primary/40" />
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">POD Compliance Block</h4>
+               <div className="p-8 bg-primary/[0.03] border border-primary/20 rounded-xl space-y-4">
+                  <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary shadow-sm">
+                        <Clock size={20} />
                      </div>
-                     <div className="p-10 border-2 border-dashed border-border/40 rounded-[3rem] bg-muted/5 flex flex-col items-center justify-center gap-6 relative group overflow-hidden h-48">
-                        <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        {dnGenerated ? (
-                           <div className="flex flex-col items-center gap-4 animate-in zoom-in-95">
-                              <ShieldCheck className="text-emerald-500" size={56} />
-                              <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Digital Seal Link Verified</span>
-                           </div>
-                        ) : (
-                           <>
-                              <Smartphone className="text-muted-foreground/20 group-hover:scale-110 transition-all" size={48} />
-                              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40 text-center leading-relaxed">Finalize to trigger Site Foreman <br/> mobile signature link.</p>
-                           </>
-                        )}
+                     <div>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">Estimated Transit</p>
+                        <p className="text-xs font-bold text-foreground italic">Today, ~17:45 GST</p>
                      </div>
                   </div>
-
-                  <div className="flex flex-col gap-8">
-                     <div className="p-10 bg-primary/[0.03] border border-primary/10 rounded-[3rem] space-y-6 relative overflow-hidden">
-                        <div className="absolute -top-4 -right-4 opacity-5 pointer-events-none">
-                           <Truck size={120} />
-                        </div>
-                        <div className="space-y-2">
-                           <p className="text-[10px] font-black uppercase tracking-widest text-primary">Dispatch Commitment</p>
-                           <p className="text-sm font-black text-foreground italic leading-tight uppercase">Confirmed Site Handover Mode</p>
-                        </div>
-                        <Button 
-                          onClick={handleGenerateDN}
-                          disabled={isGeneratingDN || dnGenerated}
-                          className="w-full h-16 rounded-2xl bg-foreground text-background font-black uppercase tracking-widest text-[11px] shadow-2xl transition-all active:scale-95 group"
-                        >
-                           {isGeneratingDN ? <Loader2 className="animate-spin" /> : dnGenerated ? <span className="flex items-center gap-2"><CheckCircle size={16} /> DN Authorized</span> : <span className="flex items-center gap-2">Authorize Dispatch <ArrowRight size={16} className="group-hover:translate-x-2 transition-transform" /></span>}
-                        </Button>
+                  <Separator className="bg-primary/20 opacity-30" />
+                  <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary shadow-sm">
+                        <Truck size={20} />
+                     </div>
+                     <div>
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/60">Fleet Node</p>
+                        <p className="text-xs font-bold text-foreground italic">AE-LOG-944-G</p>
                      </div>
                   </div>
                </div>
             </div>
-         </div>
 
-         {/* Sidebar Controls - Logistics Deck */}
-         <div className="lg:col-span-4 xl:col-span-3 space-y-8 sticky top-28 animate-in slide-in-from-right-8 duration-1000">
-            <Card className="border-border/40 bg-background/60 backdrop-blur-xl rounded-[3rem] shadow-2xl overflow-hidden">
-               <div className="p-8 pb-4">
-                  <h4 className="text-xs font-black text-muted-foreground/40 uppercase tracking-[0.3em]">Lifecycle Deck</h4>
-               </div>
+            {/* Transit Simulation Deck */}
+            <div className="mb-16 relative h-48 bg-muted/10 rounded-2xl border border-border/40 overflow-hidden flex items-center justify-center group">
+               <div className="absolute inset-0 opacity-10 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
                
-               <CardContent className="p-8 pt-0 space-y-8">
-                  <div className="space-y-4">
-                     <div className="flex items-center gap-4 p-4 bg-muted/20 border border-border/50 rounded-2xl group hover:bg-primary/5 hover:border-primary/20 transition-all cursor-pointer">
-                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                           <Box size={20} />
-                        </div>
-                        <div className="space-y-0.5">
-                           <p className="text-[10px] font-black uppercase tracking-widest text-foreground">POD Mobile Link</p>
-                           <p className="text-[8px] text-muted-foreground/60 font-black uppercase tracking-widest opacity-50">Gateway 944</p>
-                        </div>
+               <div className="relative w-full max-w-xl h-0.5 border-t border-dashed border-primary/30 flex justify-between items-center px-8">
+                  <div className="relative">
+                     <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center outline outline-4 outline-white shadow-md">
+                        <MapPin size={18} className="text-primary" />
                      </div>
-                     <div className="flex items-center gap-4 p-4 bg-muted/20 border border-border/50 rounded-2xl group hover:bg-primary/5 hover:border-primary/20 transition-all cursor-pointer">
-                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                           <Download size={20} />
-                        </div>
-                        <div className="space-y-0.5">
-                           <p className="text-[10px] font-black uppercase tracking-widest text-foreground">Delivery Note</p>
-                           <p className="text-[8px] text-muted-foreground/60 font-black uppercase tracking-widest opacity-50">Logistics Log</p>
+                     <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase tracking-wider text-muted-foreground/50">Warehouse</span>
+                  </div>
+                  
+                  <div className="relative animate-in slide-in-from-left-[5%] duration-[15000ms] infinite">
+                     <div className="p-3 bg-primary rounded-xl shadow-lg shadow-primary/20 text-white flex flex-col items-center gap-0.5">
+                        <Truck size={20} className="animate-pulse" />
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white px-3 py-1.5 rounded-lg border border-border/40 shadow-md whitespace-nowrap">
+                           <span className="text-[8px] font-bold text-primary uppercase tracking-wider italic">AE-LOG-944 Transit</span>
                         </div>
                      </div>
                   </div>
 
-                  <div className="p-8 bg-amber-50/30 border border-amber-200/50 rounded-[2.5rem] space-y-4 text-center">
-                     <AlertCircle size={24} className="mx-auto text-amber-600/40" />
-                     <p className="text-[9px] font-black uppercase tracking-widest text-amber-800/60 leading-relaxed italic">
-                        Confirming final fulfillment will move the commercial lifecycle to Step 9: Finance Affirmation.
-                     </p>
-                  </div>
-
-                  <Button 
-                    onClick={handleFinalize}
-                    disabled={isFinalizing || !dnGenerated}
-                    className="w-full h-20 rounded-[2.5rem] bg-primary text-primary-foreground font-black text-xs uppercase tracking-[0.3em] transition-all hover:scale-[1.02] active:scale-95 shadow-[0_15px_40px_rgba(var(--primary),0.3)] group overflow-hidden relative"
-                  >
-                     <div className="relative z-10 flex items-center gap-4">
-                        {isFinalizing ? <Loader2 className="animate-spin" size={20} /> : (
-                           <>
-                              <span>Dispatch Done</span>
-                              <Separator orientation="vertical" className="h-4 bg-white/20" />
-                              <CheckCircle size={18} />
-                           </>
-                        )}
+                  <div className="relative">
+                     <div className="w-10 h-10 bg-muted/60 rounded-full flex items-center justify-center outline outline-4 outline-white shadow-sm">
+                        <MapPin size={18} className="text-muted-foreground/30" />
                      </div>
-                  </Button>
-               </CardContent>
-            </Card>
+                     <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase tracking-wider text-muted-foreground/50">DXB Site</span>
+                  </div>
+               </div>
+            </div>
 
-            <div className="flex items-center justify-center gap-4 px-8">
-              <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl border border-border/40 hover:bg-muted text-muted-foreground/30"><Printer size={18} /></Button>
-              <Button variant="ghost" size="icon" className="h-12 w-12 rounded-xl border border-border/40 hover:bg-muted text-muted-foreground/30"><Download size={18} /></Button>
-           </div>
+            {/* Recipient Affirmation Block */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 pt-12 border-t border-border/40 items-end">
+               <div className="space-y-6">
+                  <div className="flex items-center gap-2">
+                     <QrCode size={20} className="text-primary/40" />
+                     <h4 className="text-[9px] font-bold uppercase tracking-wider text-primary">Compliance Acknowledgement</h4>
+                  </div>
+                  <div className="p-8 border-2 border-dashed border-border/40 rounded-2xl bg-muted/5 flex flex-col items-center justify-center gap-4 relative group overflow-hidden h-40">
+                     <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                     {dnGenerated ? (
+                        <div className="flex flex-col items-center gap-3 animate-in zoom-in-95">
+                           <ShieldCheck className="text-emerald-500" size={40} />
+                           <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600">Digital Lock Authorized</span>
+                        </div>
+                     ) : (
+                        <>
+                           <Smartphone className="text-muted-foreground/20 group-hover:scale-110 transition-all" size={32} />
+                           <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/40 text-center leading-relaxed">Dispatch to trigger site <br/> contact verification link.</p>
+                        </>
+                     )}
+                  </div>
+               </div>
+
+               <div className="flex flex-col gap-6">
+                  <div className="p-8 bg-primary/[0.03] border border-primary/10 rounded-2xl space-y-4 relative overflow-hidden">
+                     <div className="absolute -top-2 -right-2 opacity-5 pointer-events-none">
+                        <Truck size={80} />
+                     </div>
+                     <div className="space-y-1">
+                        <p className="text-[9px] font-bold uppercase tracking-wider text-primary">Verification Action</p>
+                        <p className="text-xs font-bold text-foreground italic leading-tight uppercase">Commit Dispatch Metadata</p>
+                     </div>
+                     <Button 
+                       onClick={handleGenerateDN}
+                       disabled={isGeneratingDN || dnGenerated}
+                       size="sm"
+                       className="w-full h-11 rounded-lg bg-foreground text-background font-bold uppercase tracking-wider text-[10px] shadow-lg transition-all active:scale-95 group"
+                     >
+                        {isGeneratingDN ? <Loader2 className="animate-spin" size={16} /> : dnGenerated ? <span className="flex items-center gap-2"><CheckCircle size={14} /> DN Authorized</span> : <span className="flex items-center gap-2">Authorize Dispatch <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" /></span>}
+                     </Button>
+                  </div>
+               </div>
+            </div>
          </div>
+      </div>
+
+      {/* Floating Action Bar */}
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4 animate-in slide-in-from-bottom-10 fade-in duration-1000 delay-500">
+         <div className="bg-background/80 backdrop-blur-2xl border-2 border-border/40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] rounded-3xl p-4 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-8 px-4">
+            <div className="hidden md:block">
+              <p className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] mb-1">Fleet Selection</p>
+              <p className="text-sm font-black text-foreground tracking-tighter uppercase">{fleetType} Cluster</p>
+            </div>
+            <Separator orientation="vertical" className="h-8 hidden md:block bg-border/40" />
+            <div>
+              <p className="text-[10px] font-black uppercase text-primary tracking-[0.2em] mb-1">Authorization Status</p>
+              <p className={cn("text-sm font-black tracking-tighter italic uppercase", dnGenerated ? "text-emerald-600" : "text-amber-600")}>
+                {dnGenerated ? 'DN Authorized' : 'Sign-off Required'}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" className="h-11 rounded-2xl px-6 font-black text-[10px] uppercase tracking-widest text-muted-foreground/60 hover:text-primary transition-all">
+              <Printer size={16} className="mr-2" /> Print DN
+            </Button>
+            <Button 
+              onClick={handleFinalize}
+              disabled={isFinalizing || !dnGenerated}
+              size="sm"
+              className="h-11 rounded-xl px-10 bg-foreground text-background font-black text-[10px] uppercase tracking-[0.2em] hover:bg-foreground/90 transition-all disabled:opacity-20 shadow-xl"
+            >
+              {isFinalizing ? <Loader2 className="animate-spin mr-2" size={16} /> : (
+                <span className="flex items-center gap-2 italic">Finish Logistics <ArrowRight size={16} /></span>
+              )}
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

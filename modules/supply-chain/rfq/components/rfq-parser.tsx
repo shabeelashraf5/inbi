@@ -90,7 +90,7 @@ export function RFQParser({ onParsed }: { onParsed: (items: ExtractedItem[]) => 
         <CardContent className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
           <h3 className="text-xl font-semibold mb-2">
-            {isUploading ? 'Uploading Document...' : 'AI is parsing your RFQ...'}
+            {isUploading ? 'Uploading Document...' : 'AI is extracting your RFQ items...'}
           </h3>
           <p className="text-muted-foreground text-sm max-w-xs text-center">
             {isUploading 
@@ -141,8 +141,8 @@ export function RFQParser({ onParsed }: { onParsed: (items: ExtractedItem[]) => 
               <Check className="text-emerald-600" size={20} />
             </div>
             <div>
-              <CardTitle className="text-lg">AI Parsing Complete</CardTitle>
-              <p className="text-xs text-muted-foreground">Document: {file.name}</p>
+              <CardTitle className="text-lg">AI Extraction Complete</CardTitle>
+              <p className="text-xs text-muted-foreground font-medium">Verify the line items for Item Review</p>
             </div>
           </div>
           <Button variant="ghost" size="sm" onClick={() => setFile(null)}>

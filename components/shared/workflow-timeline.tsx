@@ -4,7 +4,7 @@ import { Check, CircleDot, Activity, ClipboardList, Target, Truck, Calculator } 
 
 export enum WorkflowStage {
   RFQ_ENTRY = 'RFQ Entry',
-  AI_PARSING = 'AI Parsing',
+  ITEM_REVIEW = 'Item Review',
   PROCUREMENT = 'Procurement',
   SUPPLIER_QUOTE = 'Supplier Quote',
   CLIENT_QUOTE = 'Client Quote',
@@ -25,7 +25,7 @@ export enum WorkflowPhase {
 const STAGES = Object.values(WorkflowStage);
 
 const PHASE_MAP: Record<WorkflowPhase, WorkflowStage[]> = {
-  [WorkflowPhase.INTAKE]: [WorkflowStage.RFQ_ENTRY, WorkflowStage.AI_PARSING],
+  [WorkflowPhase.INTAKE]: [WorkflowStage.RFQ_ENTRY, WorkflowStage.ITEM_REVIEW],
   [WorkflowPhase.SOURCING]: [WorkflowStage.PROCUREMENT, WorkflowStage.SUPPLIER_QUOTE],
   [WorkflowPhase.ORDERING]: [WorkflowStage.CLIENT_QUOTE, WorkflowStage.CLIENT_PO, WorkflowStage.SUPPLIER_PO],
   [WorkflowPhase.FULFILLMENT]: [WorkflowStage.GOODS_RECEIPT, WorkflowStage.DELIVERY, WorkflowStage.FINANCE],

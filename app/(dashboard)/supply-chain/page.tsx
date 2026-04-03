@@ -12,10 +12,13 @@ import { SC_KPIS, SC_PIPELINE_DATA, SC_RECENT_RFQS, SC_REVENUE_TREND } from '@/l
 import Link from 'next/link';
 import { Plus, ArrowRight, Activity, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { WorkflowTimeline, WorkflowStage } from '@/components/shared/workflow-timeline';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip,
-  ResponsiveContainer, AreaChart, Area, Legend, Cell
-} from 'recharts';
+import dynamic from 'next/dynamic';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const VolumeBarChart = dynamic(() => import('@/components/dashboard/volume-bar-chart'), {
+  loading: () => <Skeleton className="w-full h-[320px] rounded-xl" />,
+  ssr: false
+});
 import { cn } from '@/lib/utils';
 
 export default function SupplyChainDashboardPage() {
@@ -63,7 +66,7 @@ export default function SupplyChainDashboardPage() {
             </div>
          </CardHeader>
          <CardContent className="pt-6">
-            <WorkflowTimeline currentStage={WorkflowStage.PROCUREMENT} completedStages={[WorkflowStage.RFQ_ENTRY, WorkflowStage.AI_PARSING]} />
+            <WorkflowTimeline currentStage={WorkflowStage.PROCUREMENT} completedStages={[WorkflowStage.RFQ_ENTRY, WorkflowStage.ITEM_REVIEW]} />
          </CardContent>
       </Card>
 
@@ -89,33 +92,7 @@ export default function SupplyChainDashboardPage() {
                   </Button>
                </CardHeader>
                <CardContent>
-                  <div className="h-[320px] mt-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                     <BarChart data={SC_PIPELINE_DATA} margin={{ top: 5, right: 20, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.90 0.01 75)" vertical={false} />
-                        <XAxis dataKey="stage" tick={{ fontSize: 11, fontWeight: 'bold' }} stroke="oklch(0.52 0.02 60)" axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 12 }} stroke="oklch(0.52 0.02 60)" axisLine={false} tickLine={false} />
-                        <RechartsTooltip
-                           cursor={{ fill: 'oklch(0.95 0.01 75)', opacity: 0.4 }}
-                           contentStyle={{
-                              backgroundColor: 'oklch(0.995 0.002 80)',
-                              border: '1px solid oklch(0.90 0.01 75)',
-                              borderRadius: '12px',
-                              fontSize: '13px',
-                              boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                           }}
-                        />
-                        <Bar dataKey="count" radius={[6, 6, 0, 0]} barSize={40}>
-                           {SC_PIPELINE_DATA.map((entry, index) => (
-                              <Cell 
-                                 key={`cell-${index}`} 
-                                 fill={index % 2 === 0 ? 'oklch(0.62 0.09 55)' : 'oklch(0.58 0.12 160)'} 
-                              />
-                           ))}
-                        </Bar>
-                     </BarChart>
-                  </ResponsiveContainer>
-                  </div>
+                  <VolumeBarChart data={SC_PIPELINE_DATA} />
                </CardContent>
             </Card>
 

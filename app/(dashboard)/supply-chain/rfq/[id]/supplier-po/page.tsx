@@ -127,168 +127,160 @@ export default function SupplierPOPage({ params }: { params: Promise<{ id: strin
   const subtotal = selectedVendor?.items.reduce((acc, item) => acc + item.total, 0) || 0;
 
   return (
-    <div className="w-full space-y-12 pb-48 px-2 max-w-[1440px] animate-in fade-in duration-1000">
+    <div className="w-full space-y-8 pb-32 px-4 md:px-10 animate-in fade-in duration-700">
       {/* Header & Timeline */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
         <PageHeader 
           title="Supplier Purchase Order Portal" 
           description="View, verify, and generate official Purchase Orders for authorized sub-suppliers." 
         />
-        <div className="bg-muted/10 rounded-[2.5rem] p-4 border border-border/50">
+        <div className="bg-muted/10 rounded-xl p-2 border border-border/50">
            <WorkflowTimeline currentStage={WorkflowStage.SUPPLIER_PO} />
         </div>
       </div>
 
       {selectedVendorIdx === null ? (
         /* VENDOR QUEUE LIST (MASTER) */
-        <div className="space-y-8 animate-in slide-in-from-bottom-4">
-           <div className="flex items-center justify-between px-6">
-              <div className="flex items-center gap-3">
-                 <div className="w-1.5 h-6 bg-primary rounded-full" />
-                 <h2 className="text-sm font-black uppercase tracking-[0.2em] text-foreground/70">Supplier Purchase Orders Queue</h2>
+        <div className="space-y-6 animate-in slide-in-from-bottom-4">
+           <div className="flex items-center justify-between px-2">
+              <div className="flex items-center gap-2">
+                 <div className="w-1 h-4 bg-primary rounded-full" />
+                 <h2 className="text-xs font-bold uppercase tracking-wider text-foreground/70">Supplier Purchase Orders Queue</h2>
               </div>
            </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {vendors.map((vendor, idx) => (
-                 <Card key={idx} className="group relative border-border/40 bg-background/50 backdrop-blur-md rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/[0.02] hover:border-primary/20 transition-all cursor-pointer" onClick={() => setSelectedVendorIdx(idx)}>
-                    <CardContent className="p-10 flex flex-col justify-between h-full space-y-12">
+                 <Card key={idx} className="group relative border-border/40 bg-background/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-sm hover:border-primary/20 transition-all cursor-pointer" onClick={() => setSelectedVendorIdx(idx)}>
+                    <CardContent className="p-6 flex flex-col justify-between h-full space-y-8">
                        <div className="flex items-start justify-between">
-                          <div className="flex items-center gap-6">
-                             <div className="w-16 h-16 bg-primary/10 rounded-[1.8rem] flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500 shadow-xl shadow-primary/10">
-                                <Building size={28} />
+                          <div className="flex items-center gap-4">
+                             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-500">
+                                <Building size={24} />
                              </div>
                              <div>
-                                <h3 className="text-xl font-black text-foreground tracking-tight">{vendor.name}</h3>
-                                <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/50 mt-1">TRN: {vendor.trn}</p>
+                                <h3 className="text-lg font-bold text-foreground tracking-tight">{vendor.name}</h3>
+                                <p className="text-[9px] uppercase font-bold tracking-wider text-muted-foreground/50 mt-0.5">TRN: {vendor.trn}</p>
                              </div>
                           </div>
                           <div className={cn(
-                             "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                             "px-3 py-1 rounded-full text-[8px] font-bold uppercase tracking-wider border",
                              vendor.status === 'authorized' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-amber-50 text-amber-600 border-amber-100"
                           )}>
                              {vendor.status}
                           </div>
                        </div>
 
-                       <div className="grid grid-cols-2 gap-8">
-                          <div className="space-y-1">
-                             <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Procured Items</p>
-                             <p className="text-lg font-black text-foreground">{vendor.items.length} SKUs</p>
+                       <div className="grid grid-cols-2 gap-6">
+                          <div className="space-y-0.5">
+                             <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/40">Procured Items</p>
+                             <p className="text-base font-bold text-foreground">{vendor.items.length} SKUs</p>
                           </div>
-                          <div className="space-y-1 text-right">
-                             <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/40">Order Value</p>
-                             <p className="text-lg font-black text-primary font-mono">${vendor.items.reduce((s, i) => s + i.total, 0).toLocaleString()}</p>
+                          <div className="space-y-0.5 text-right">
+                             <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/40">Order Value</p>
+                             <p className="text-base font-bold text-primary font-mono">${vendor.items.reduce((s, i) => s + i.total, 0).toLocaleString()}</p>
                           </div>
                        </div>
 
-                       <Button variant="ghost" className="w-full h-12 rounded-2xl bg-muted/20 hover:bg-primary hover:text-white transition-all group/btn font-black uppercase tracking-widest text-[9px]">
+                       <Button variant="ghost" size="sm" className="w-full h-9 rounded-lg bg-muted/20 hover:bg-primary hover:text-white transition-all group/btn font-bold uppercase tracking-wider text-[9px]">
                           Review PO Form <ChevronRight size={14} className="ml-2 group-hover/btn:translate-x-1" />
                        </Button>
                     </CardContent>
                  </Card>
               ))}
            </div>
-
-           <div className="flex justify-center pt-8">
-              <Button 
-                onClick={handleFinalDispatch}
-                className="h-20 px-16 rounded-[2rem] bg-primary text-primary-foreground font-black text-lg uppercase tracking-[0.3em] transition-all hover:scale-[1.02] shadow-[0_20px_50px_rgba(var(--primary),0.3)] group"
-              >
-                 Commit Final Dispatch <Send size={24} className="ml-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </Button>
-           </div>
         </div>
       ) : (
         /* PO DOCUMENT FORM (DETAIL) */
-        <div className="space-y-12 animate-in slide-in-from-right-8 duration-700">
+        <div className="space-y-8 animate-in slide-in-from-right-8 duration-700">
            {/* Form Header */}
            <div className="flex items-center justify-between">
               <Button 
                 variant="ghost" 
+                size="sm"
                 onClick={() => setSelectedVendorIdx(null)}
-                className="h-14 px-6 rounded-2xl hover:bg-muted/50 font-black uppercase tracking-widest text-[10px] group"
+                className="h-10 px-4 rounded-lg hover:bg-muted/50 font-bold uppercase tracking-wider text-[9px] group"
               >
-                 <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1" /> Back to Vendor Queue
+                 <ArrowLeft size={16} className="mr-2 group-hover:-translate-x-1" /> Back to Queue
               </Button>
-              <div className="flex items-center gap-4">
-                 <Button variant="outline" className="h-14 px-8 rounded-2xl border-border/50 font-black uppercase tracking-widest text-[10px]"><Printer size={16} className="mr-2" /> Print Preview</Button>
-                 <Button onClick={handleDownload} disabled={isDownloading} className="h-14 px-8 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-muted-foreground hover:bg-foreground">
-                    {isDownloading ? <Loader2 className="animate-spin" size={16} /> : <><Download size={16} className="mr-2" /> Download PDF</>}
+              <div className="flex items-center gap-3">
+                 <Button variant="outline" size="sm" className="h-10 px-4 rounded-lg border-border/50 font-bold uppercase tracking-wider text-[9px]"><Printer size={16} className="mr-2" /> Print</Button>
+                 <Button onClick={handleDownload} disabled={isDownloading} size="sm" className="h-10 px-4 rounded-lg font-bold uppercase tracking-wider text-[9px] bg-muted-foreground hover:bg-foreground">
+                    {isDownloading ? <Loader2 className="animate-spin" size={16} /> : <><Download size={16} className="mr-2" /> Export PDF</>}
                  </Button>
               </div>
            </div>
 
            {/* The PO Document */}
-           <div className="bg-background border border-border/40 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.15)] rounded-[4rem] overflow-hidden max-w-[1000px] mx-auto p-16 md:p-24 relative">
+           <div className="bg-background border border-border/40 shadow-xl rounded-2xl overflow-hidden max-w-4xl mx-auto p-12 md:p-16 relative">
               {/* Official Stamp Mockup */}
-              <div className="absolute top-24 right-24 rotate-12 opacity-10 pointer-events-none">
-                 <div className="w-40 h-40 border-8 border-primary rounded-full flex flex-col items-center justify-center text-primary font-black uppercase text-xl leading-none">
+              <div className="absolute top-16 right-16 rotate-12 opacity-10 pointer-events-none">
+                 <div className="w-32 h-32 border-4 border-primary rounded-full flex flex-col items-center justify-center text-primary font-bold uppercase text-lg leading-none">
                     <span>Authorized</span>
-                    <span className="text-[10px] mt-1 tracking-widest">INBI-PO-944</span>
+                    <span className="text-[8px] mt-1 tracking-widest">INBI-PO-944</span>
                  </div>
               </div>
 
               {/* Document Header */}
-              <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-24">
-                 <div className="space-y-6">
-                    <div className="w-24 h-12 bg-primary rounded-xl flex items-center justify-center text-primary-foreground font-black text-xl italic tracking-tighter">INBI</div>
-                    <div className="space-y-1">
-                       <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">From:</p>
-                       <p className="text-xs font-black text-foreground">INBI Technical Solutions LLC</p>
-                       <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[250px]">Suite 405, Business Bay Tower,<br/>Downtown Dubai, UAE.<br/>TRN: 100994401200003</p>
+              <div className="flex flex-col md:flex-row justify-between items-start gap-8 mb-16">
+                 <div className="space-y-4">
+                    <div className="w-20 h-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-lg italic tracking-tighter">INBI</div>
+                    <div className="space-y-0.5">
+                       <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/30">From:</p>
+                       <p className="text-xs font-bold text-foreground">INBI Technical Solutions LLC</p>
+                       <p className="text-[9px] text-muted-foreground leading-relaxed max-w-[200px]">Suite 405, Business Bay Tower,<br/>Downtown Dubai, UAE.<br/>TRN: 100994401200003</p>
                     </div>
                  </div>
-                 <div className="text-right space-y-6">
-                    <h2 className="text-4xl font-black text-foreground tracking-tighter uppercase">Purchase Order</h2>
-                    <div className="space-y-1">
-                       <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">PO Serial Number:</p>
-                       <p className="text-lg font-black text-primary font-mono tracking-tighter">PO-{id}-V0{selectedVendorIdx + 1}</p>
-                       <p className="text-[10px] font-bold text-muted-foreground">Date: April 03, 2026</p>
+                 <div className="text-right space-y-4">
+                    <h2 className="text-3xl font-bold text-foreground tracking-tighter uppercase">Purchase Order</h2>
+                    <div className="space-y-0.5">
+                       <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/30">PO Serial Number:</p>
+                       <p className="text-base font-bold text-primary font-mono tracking-tighter">PO-{id}-V0{selectedVendorIdx + 1}</p>
+                       <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 italic">Date: April 03, 2026</p>
                     </div>
                  </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-24">
-                 <div className="p-8 bg-muted/20 border border-border/50 rounded-3xl space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">To: (Supplier)</p>
-                    <div className="space-y-1">
-                       <h4 className="text-lg font-black text-foreground">{selectedVendor?.name}</h4>
-                       <p className="text-xs font-medium text-muted-foreground leading-relaxed">{selectedVendor?.address}</p>
-                       <p className="text-[10px] font-black text-foreground mt-2 uppercase tracking-widest">Attn: {selectedVendor?.contact}</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
+                 <div className="p-6 bg-muted/20 border border-border/50 rounded-xl space-y-3">
+                    <p className="text-[8px] font-bold uppercase tracking-wider text-primary">To: (Supplier)</p>
+                    <div className="space-y-0.5">
+                       <h4 className="text-base font-bold text-foreground">{selectedVendor?.name}</h4>
+                       <p className="text-[11px] font-medium text-muted-foreground leading-relaxed">{selectedVendor?.address}</p>
+                       <p className="text-[9px] font-bold text-foreground mt-2 uppercase tracking-wider">Attn: {selectedVendor?.contact}</p>
                     </div>
                  </div>
-                 <div className="p-8 bg-muted/5 border border-border/30 rounded-3xl space-y-4">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40">Ship To: (Delivery Location)</p>
-                    <div className="space-y-1">
-                       <h4 className="text-lg font-black text-foreground">Dubai Metro Site - Phase 4</h4>
-                       <p className="text-xs font-medium text-muted-foreground leading-relaxed">Jumeirah Village Circle Link,<br/>Dubai, UAE</p>
-                       <p className="text-[10px] font-black text-primary mt-2 uppercase tracking-widest">Ref RFQ: {id}</p>
+                 <div className="p-6 bg-muted/5 border border-border/30 rounded-xl space-y-3">
+                    <p className="text-[8px] font-bold uppercase tracking-wider text-muted-foreground/40">Ship To: (Delivery Location)</p>
+                    <div className="space-y-0.5">
+                       <h4 className="text-base font-bold text-foreground">Dubai Metro Site - Phase 4</h4>
+                       <p className="text-[11px] font-medium text-muted-foreground leading-relaxed">Jumeirah Village Circle Link,<br/>Dubai, UAE</p>
+                       <p className="text-[9px] font-bold text-primary mt-2 uppercase tracking-wider">Ref RFQ: {id}</p>
                     </div>
                  </div>
               </div>
 
               {/* Line Items Table */}
-              <div className="mb-24">
+              <div className="mb-16">
                  <table className="w-full">
                     <thead>
-                       <tr className="border-b border-border/50 h-14">
-                          <th className="text-left py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Item (SKU)</th>
-                          <th className="text-center py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Qty</th>
-                          <th className="text-right py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Unit (Ex)</th>
-                          <th className="text-right py-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">Total (Ex)</th>
+                       <tr className="border-b border-border/50 h-11">
+                          <th className="text-left py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">Item (SKU)</th>
+                          <th className="text-center py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">Qty</th>
+                          <th className="text-right py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">Unit (Ex)</th>
+                          <th className="text-right py-2 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">Total (Ex)</th>
                        </tr>
                     </thead>
                     <tbody>
                        {selectedVendor?.items.map((item, i) => (
-                          <tr key={i} className="border-b border-border/30 h-20 group">
-                             <td className="py-6">
-                                <p className="text-sm font-black text-foreground">{item.name}</p>
-                                <p className="text-[9px] font-mono text-muted-foreground/50 group-hover:text-primary transition-colors">{item.sku}</p>
+                          <tr key={i} className="border-b border-border/30 h-16 group">
+                             <td className="py-4">
+                                <p className="text-xs font-bold text-foreground">{item.name}</p>
+                                <p className="text-[8px] font-mono text-muted-foreground/50 group-hover:text-primary transition-colors">{item.sku}</p>
                              </td>
-                             <td className="text-center font-bold text-sm text-foreground">{item.qty}</td>
-                             <td className="text-right font-black text-sm text-muted-foreground/70">${item.unitPrice.toLocaleString()}</td>
-                             <td className="text-right font-black text-sm text-foreground italic">${item.total.toLocaleString()}</td>
+                             <td className="text-center font-bold text-xs text-foreground">{item.qty}</td>
+                             <td className="text-right font-bold text-xs text-muted-foreground/70">${item.unitPrice.toLocaleString()}</td>
+                             <td className="text-right font-bold text-xs text-foreground italic">${item.total.toLocaleString()}</td>
                           </tr>
                        ))}
                     </tbody>
@@ -296,20 +288,20 @@ export default function SupplierPOPage({ params }: { params: Promise<{ id: strin
               </div>
 
               {/* Commercial Summary */}
-              <div className="flex flex-col items-end space-y-6 mb-24">
-                 <div className="w-full md:w-80 space-y-4">
-                    <div className="flex justify-between items-center text-sm">
-                       <span className="font-black uppercase tracking-[0.15em] text-muted-foreground/50 text-[10px]">Net Value (Ex VAT)</span>
-                       <span className="font-black text-foreground">${subtotal.toLocaleString()}</span>
+              <div className="flex flex-col items-end space-y-4 mb-16">
+                 <div className="w-full md:w-64 space-y-3">
+                    <div className="flex justify-between items-center text-xs">
+                       <span className="font-bold uppercase tracking-wider text-muted-foreground/50 text-[9px]">Net Subtotal</span>
+                       <span className="font-bold text-foreground">${subtotal.toLocaleString()}</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm">
-                       <span className="font-black uppercase tracking-[0.15em] text-muted-foreground/50 text-[10px]">VAT Amount (5%)</span>
-                       <span className="font-black text-foreground">${(subtotal * 0.05).toLocaleString()}</span>
+                    <div className="flex justify-between items-center text-xs">
+                       <span className="font-bold uppercase tracking-wider text-muted-foreground/50 text-[9px]">VAT (5%)</span>
+                       <span className="font-bold text-foreground">${(subtotal * 0.05).toLocaleString()}</span>
                     </div>
                     <Separator className="bg-border/50 h-0.5" />
-                    <div className="flex justify-between items-center py-2">
-                       <span className="font-black uppercase tracking-[0.2em] text-primary text-[11px]">Authorized Total</span>
-                       <span className="font-black text-3xl text-foreground tracking-tighter italic">
+                    <div className="flex justify-between items-center py-1">
+                       <span className="font-bold uppercase tracking-wider text-primary text-[10px]">Total Amount</span>
+                       <span className="font-bold text-2xl text-foreground tracking-tighter italic">
                           ${(subtotal * 1.05).toLocaleString()}
                        </span>
                     </div>
@@ -317,45 +309,97 @@ export default function SupplierPOPage({ params }: { params: Promise<{ id: strin
               </div>
 
               {/* Approvals & Terms */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-24 items-end">
-                 <div className="space-y-6">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-primary">PO Terms & Conditions</h4>
-                    <p className="text-[9px] text-muted-foreground leading-relaxed">
-                       1. This Purchase Order is valid only with an authorized digital stamp.<br/>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-end">
+                 <div className="space-y-4">
+                    <h4 className="text-[9px] font-bold uppercase tracking-wider text-primary">PO Terms & Conditions</h4>
+                    <p className="text-[8px] text-muted-foreground leading-relaxed italic border-l-2 border-primary/20 pl-4">
+                       1. Official document valid with digital seal.<br/>
                        2. Payment terms as per Master Service Agreement (MSA).<br/>
-                       3. Goods must be delivered within 14 business days of authorization.<br/>
-                       4. TRN linkage is mandatory for VAT reconciliation.
+                       3. Delivery required within 14 business days.<br/>
+                       4. TRN linkage mandatory for tax reconciliation.
                     </p>
                  </div>
-                 <div className="space-y-8 flex flex-col items-center">
-                    <div className="w-full p-10 border-2 border-dashed border-border/60 rounded-3xl bg-muted/5 flex flex-col items-center justify-center group relative overflow-hidden h-40">
+                 <div className="space-y-6 flex flex-col items-center">
+                    <div className="w-full p-6 border-2 border-dashed border-border/60 rounded-xl bg-muted/5 flex flex-col items-center justify-center group relative overflow-hidden h-32">
                        {selectedVendor?.status === 'authorized' ? (
-                          <div className="flex flex-col items-center animate-in zoom-in-90 gap-4">
-                             <ShieldCheck className="text-emerald-500 scale-[2.5]" />
-                             <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600 mt-4">Procurement Authorization Verified</span>
+                          <div className="flex flex-col items-center animate-in zoom-in-90 gap-2">
+                             <ShieldCheck className="text-emerald-500" size={32} />
+                             <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600">Authorization Verified</span>
                           </div>
                        ) : (
                          <>
-                           <FileCheck className="text-muted-foreground/20 group-hover:text-primary transition-all scale-[2]" />
-                           <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/40 mt-8 group-hover:text-primary transition-all">Procurement Officer Seal</span>
+                           <FileCheck className="text-muted-foreground/20 group-hover:text-primary transition-all" size={32} />
+                           <span className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/40 mt-4 group-hover:text-primary transition-all">Procurement Seal Pending</span>
                          </>
                        )}
                     </div>
-                    
-                    {selectedVendor?.status !== 'authorized' && (
-                       <Button 
-                        onClick={() => handleAuthorize(selectedVendorIdx)} 
-                        disabled={isAuthorizing}
-                        className="w-full h-16 rounded-2xl bg-primary text-primary-foreground font-black uppercase tracking-widest text-[11px] shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all"
-                       >
-                          {isAuthorizing ? <Loader2 className="animate-spin" /> : 'Authorize Purchase Order'}
-                       </Button>
-                    )}
                  </div>
               </div>
            </div>
         </div>
       )}
+
+      {/* Floating Action Bar */}
+      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-4xl px-4 animate-in slide-in-from-bottom-10 fade-in duration-1000 delay-500">
+         <div className="bg-background/80 backdrop-blur-2xl border-2 border-border/40 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.3)] rounded-3xl p-4 flex items-center justify-between gap-6">
+          <div className="flex items-center gap-8 px-4">
+            {selectedVendorIdx === null ? (
+               <div>
+                  <p className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] mb-1">Total Suppliers</p>
+                  <p className="text-sm font-black text-foreground tracking-tighter">{vendors.length} Vendors</p>
+               </div>
+            ) : (
+               <div>
+                  <p className="text-[10px] font-black uppercase text-primary tracking-[0.2em] mb-1">PO Total (incl. VAT)</p>
+                  <p className="text-sm font-black text-foreground tracking-tighter">
+                    ${(subtotal * 1.05).toLocaleString()}
+                  </p>
+               </div>
+            )}
+            <Separator orientation="vertical" className="h-8 hidden md:block bg-border/40" />
+            <div className="hidden md:block">
+              <p className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em] mb-1">Queue Status</p>
+              <p className="text-sm font-black text-foreground tracking-tighter">
+                {vendors.filter(v => v.status === 'authorized').length} / {vendors.length} Authorized
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {selectedVendorIdx !== null && selectedVendor?.status !== 'authorized' && (
+              <Button 
+                onClick={() => handleAuthorize(selectedVendorIdx)} 
+                disabled={isAuthorizing}
+                size="sm"
+                className="h-11 rounded-xl px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/20"
+              >
+                {isAuthorizing ? <Loader2 className="animate-spin" size={16} /> : 'Authorize PO'}
+              </Button>
+            )}
+            
+            {selectedVendorIdx === null ? (
+              <Button 
+                onClick={handleFinalDispatch}
+                disabled={!vendors.every(v => v.status === 'authorized')}
+                size="sm"
+                className="h-11 rounded-xl px-8 bg-foreground text-background font-black text-[10px] uppercase tracking-[0.2em] hover:bg-foreground/90 transition-all disabled:opacity-20 shadow-xl"
+              >
+                Commit Final Dispatch <Send size={16} className="ml-2" />
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => setSelectedVendorIdx(null)}
+                variant="ghost"
+                size="sm"
+                className="h-11 rounded-2xl px-6 font-black text-[10px] uppercase tracking-widest text-muted-foreground/60 hover:text-foreground transition-all"
+              >
+                Close Document
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
+
   );
 }
