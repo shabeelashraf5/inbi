@@ -45,13 +45,13 @@ const PRIORITY_STYLES: Record<string, string> = {
   urgent: 'bg-rose-100 text-rose-700',
 };
 
-// Phase mapping for the progress strip
-const STATUS_TO_PHASE: Record<RFQStatus, number> = {
+// Step mapping for the 10-stage supply chain workflow
+const STATUS_TO_STEP: Record<RFQStatus, number> = {
   [RFQStatus.DRAFT]: 1,
-  [RFQStatus.SUBMITTED]: 1,
-  [RFQStatus.UNDER_REVIEW]: 2,
-  [RFQStatus.QUOTED]: 2,
-  [RFQStatus.APPROVED]: 3,
+  [RFQStatus.SUBMITTED]: 2,
+  [RFQStatus.UNDER_REVIEW]: 3,
+  [RFQStatus.QUOTED]: 4,
+  [RFQStatus.APPROVED]: 10,
   [RFQStatus.REJECTED]: 1,
   [RFQStatus.CANCELLED]: 1,
 };
@@ -81,10 +81,9 @@ export default function RFQListPage() {
     // For now we just track it in state
   };
 
-  // Metric Calculation (Mocked)
   const metrics = [
-    { label: 'Active Intake', value: rfqs.filter(r => STATUS_TO_PHASE[r.status] === 1).length, icon: FileSearch, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'Sourcing Items', value: rfqs.filter(r => STATUS_TO_PHASE[r.status] === 2).length, icon: ShoppingCart, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { label: 'Active Intake', value: rfqs.filter(r => STATUS_TO_STEP[r.status] <= 2).length, icon: FileSearch, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'Sourcing Items', value: rfqs.filter(r => STATUS_TO_STEP[r.status] >= 3 && STATUS_TO_STEP[r.status] <= 5).length, icon: ShoppingCart, color: 'text-amber-600', bg: 'bg-amber-50' },
     { label: 'Urgent Action', value: rfqs.filter(r => r.priority === 'urgent').length, icon: AlertCircle, color: 'text-rose-600', bg: 'bg-rose-50' },
     { label: 'Delivered (MTD)', value: 12, icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
   ];
@@ -190,23 +189,23 @@ export default function RFQListPage() {
                     </div>
                   </td>
                   <td className="px-6 py-6 min-w-[200px]">
-                    <div className="space-y-3">
-                       <div className="flex items-center justify-between">
-                          <StatusBadge status={rfq.status} />
-                          <span className="text-[10px] font-black uppercase text-muted-foreground/60">{Math.round((STATUS_TO_PHASE[rfq.status] / 4) * 100)}%</span>
-                       </div>
-                       <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden flex gap-0.5 p-0.5">
-                          {[1, 2, 3, 4].map((step) => (
-                             <div 
-                                key={step}
-                                className={cn(
-                                   "h-full flex-1 rounded-full transition-all duration-500",
-                                   STATUS_TO_PHASE[rfq.status] >= step ? "bg-primary" : "bg-muted-foreground/10"
-                                )}
-                             />
-                          ))}
-                       </div>
-                    </div>
+                     <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                           <StatusBadge status={rfq.status} />
+                           <span className="text-[10px] font-black uppercase text-muted-foreground/60">{Math.round((STATUS_TO_STEP[rfq.status] / 10) * 100)}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden flex gap-0.5 p-0.5">
+                           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((step) => (
+                              <div 
+                                 key={step}
+                                 className={cn(
+                                    "h-full flex-1 rounded-full transition-all duration-500",
+                                    STATUS_TO_STEP[rfq.status] >= step ? "bg-primary" : "bg-muted-foreground/10"
+                                 )}
+                              />
+                           ))}
+                        </div>
+                     </div>
                   </td>
                   <td className="px-6 py-6 hidden lg:table-cell">
                     <span className={cn('px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest', PRIORITY_STYLES[rfq.priority])}>

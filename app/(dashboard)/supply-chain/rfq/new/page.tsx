@@ -259,7 +259,7 @@ export default function NewRFQPage() {
                      <CardContent className="p-8 space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                            <div className="md:col-span-2 space-y-2">
-                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Document Title / Opportunity Name</Label>
+                              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Project Name</Label>
                               <Input 
                                  placeholder="e.g. Dubai Metro Expansion - Phase 4 Structural Steel" 
                                  value={manualRfq.title}
@@ -480,7 +480,7 @@ export default function NewRFQPage() {
                <div className="bg-background/90 backdrop-blur-xl border border-primary/20 shadow-[0_20px_50px_rgba(var(--primary),0.15)] rounded-3xl p-4 flex items-center justify-between gap-8 transition-all hover:scale-[1.01] hover:shadow-[0_20px_60px_rgba(var(--primary),0.2)]">
                   <div className="flex items-center gap-10 px-6 overflow-hidden">
                      <div className="flex flex-col min-w-0">
-                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Project reference</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">Project</span>
                         <h4 className={cn(
                            "text-sm font-bold truncate transition-colors",
                            !manualRfq.title ? "text-muted-foreground/40 italic" : "text-foreground"

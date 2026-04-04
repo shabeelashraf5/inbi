@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
+import { toast } from 'sonner';
 
 export interface SupplierLineItem {
   rfqItemId: string;
@@ -145,13 +146,17 @@ export function QuoteEntryForm({ rfqItems, onSubmit, isInventoryMode = false }: 
     setProposals(newProposals);
   };
 
-  const updateLineItem = (vendorIndex: number, itemIndex: number, unitPrice: number) => {
+  const updateLineItem = (vendorIndex: number, itemIndex: number, field: keyof SupplierLineItem, value: any) => {
     const newProposals = [...proposals];
     const proposal = newProposals[vendorIndex];
-    const item = proposal.lineItems[itemIndex];
+    const item = { ...proposal.lineItems[itemIndex], [field]: value };
     
-    item.unitPrice = unitPrice;
-    item.total = unitPrice * item.quantity;
+    // Recalculate total if quantity or unitPrice changed
+    if (field === 'quantity' || field === 'unitPrice') {
+       item.total = item.quantity * item.unitPrice;
+    }
+    
+    proposal.lineItems[itemIndex] = item;
     
     // Recalculate totals
     proposal.subtotal = proposal.lineItems.reduce((sum, i) => sum + i.total, 0);
@@ -159,6 +164,39 @@ export function QuoteEntryForm({ rfqItems, onSubmit, isInventoryMode = false }: 
     proposal.grandTotal = proposal.subtotal + proposal.tax;
     
     setProposals(newProposals);
+  };
+
+  const handleLineItemAdd = (vendorIndex: number) => {
+    const newProposals = [...proposals];
+    const proposal = newProposals[vendorIndex];
+    proposal.lineItems.push({
+      rfqItemId: `new-item-${Date.now()}`,
+      name: '',
+      quantity: 1,
+      unit: 'pcs',
+      unitPrice: 0,
+      total: 0
+    });
+    setProposals(newProposals);
+    toast.success('New line item added to proposal');
+  };
+
+  const handleLineItemRemove = (vendorIndex: number, itemIndex: number) => {
+    const newProposals = [...proposals];
+    const proposal = newProposals[vendorIndex];
+    if (proposal.lineItems.length > 1) {
+      proposal.lineItems.splice(itemIndex, 1);
+      
+      // Recalculate totals
+      proposal.subtotal = proposal.lineItems.reduce((sum, i) => sum + i.total, 0);
+      proposal.tax = proposal.subtotal * (proposal.vatPercent / 100);
+      proposal.grandTotal = proposal.subtotal + proposal.tax;
+      
+      setProposals(newProposals);
+      toast.info('Line item removed');
+    } else {
+      toast.error('At least one item is required per proposal');
+    }
   };
 
   const handleAddCondition = (vendorIndex: number) => {
@@ -305,14 +343,24 @@ export function QuoteEntryForm({ rfqItems, onSubmit, isInventoryMode = false }: 
 
             {/* Section 2: Line Item Pricing */}
             <section className="space-y-6">
-               <div className="flex items-center gap-4 mb-2">
-                  <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-600">
-                     <Calculator size={20} />
+               <div className="flex items-center justify-between gap-4 mb-2">
+                  <div className="flex items-center gap-4">
+                     <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-600">
+                        <Calculator size={20} />
+                     </div>
+                     <div>
+                        <h3 className="text-base font-bold text-foreground">Strategic Line-Item Pricing</h3>
+                        <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">Mapping vendor quotes to requirements</p>
+                     </div>
                   </div>
-                  <div>
-                     <h3 className="text-base font-bold text-foreground">Strategic Line-Item Pricing</h3>
-                     <p className="text-[10px] font-black text-muted-foreground/40 uppercase tracking-[0.2em]">Mapping vendor quotes to requirements</p>
-                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => handleLineItemAdd(activeVendorIndex)}
+                    className="h-9 rounded-xl border-dashed border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 font-black text-[10px] uppercase tracking-widest"
+                  >
+                     <Plus size={14} className="mr-2" /> Add Item
+                  </Button>
                </div>
 
                <div className="border border-border/40 rounded-xl overflow-hidden bg-background/40">
@@ -324,22 +372,36 @@ export function QuoteEntryForm({ rfqItems, onSubmit, isInventoryMode = false }: 
                            <th className="text-center px-4 w-20">Unit</th>
                            <th className="text-right px-4 w-40">Unit Price ($)</th>
                            <th className="text-right px-6 w-40">Line Total</th>
+                           <th className="w-12"></th>
                         </tr>
                      </thead>
                      <tbody className="divide-y divide-border/20">
                         {proposals[activeVendorIndex].lineItems.map((item, idx) => (
                            <tr key={item.rfqItemId} className="h-14 hover:bg-primary/[0.01] transition-colors group">
                               <td className="px-6">
-                                 <div className="flex flex-col">
-                                    <span className="text-sm font-bold text-foreground">{item.name}</span>
-                                    <span className="text-[10px] font-mono font-bold text-muted-foreground/40 uppercase tracking-widest">SKU REF: {item.rfqItemId.slice(0, 8)}</span>
+                                 <div className="flex flex-col gap-1">
+                                    <Input 
+                                       value={item.name} 
+                                       onChange={(e) => updateLineItem(activeVendorIndex, idx, 'name', e.target.value)}
+                                       className="h-8 text-sm font-bold border-transparent bg-primary/5 focus:bg-background transition-all p-2"
+                                    />
+                                    <span className="text-[10px] font-mono font-bold text-muted-foreground/40 uppercase tracking-widest px-2">SKU REF: {item.rfqItemId.slice(0, 8)}</span>
                                  </div>
                               </td>
                               <td className="px-4 text-center">
-                                 <span className="text-sm font-bold font-mono text-muted-foreground">{item.quantity}</span>
+                                 <Input 
+                                    type="number"
+                                    value={item.quantity} 
+                                    onChange={(e) => updateLineItem(activeVendorIndex, idx, 'quantity', parseFloat(e.target.value) || 0)}
+                                    className="h-8 w-20 mx-auto text-center font-mono font-bold text-sm border-transparent bg-primary/5 focus:bg-background transition-all p-1"
+                                 />
                               </td>
                               <td className="px-4 text-center">
-                                 <span className="text-[10px] font-black uppercase text-muted-foreground/30">{item.unit}</span>
+                                 <Input 
+                                    value={item.unit} 
+                                    onChange={(e) => updateLineItem(activeVendorIndex, idx, 'unit', e.target.value)}
+                                    className="h-8 w-16 mx-auto text-center text-[10px] font-black uppercase border-transparent bg-primary/5 focus:bg-background transition-all p-1"
+                                 />
                               </td>
                               <td className="px-4">
                                  <div className="relative flex justify-end">
@@ -347,13 +409,23 @@ export function QuoteEntryForm({ rfqItems, onSubmit, isInventoryMode = false }: 
                                     <Input 
                                        type="number"
                                        value={item.unitPrice || ''}
-                                       onChange={(e) => updateLineItem(activeVendorIndex, idx, parseFloat(e.target.value) || 0)}
+                                       onChange={(e) => updateLineItem(activeVendorIndex, idx, 'unitPrice', parseFloat(e.target.value) || 0)}
                                        className="h-9 w-32 border-transparent bg-primary/5 focus:bg-background text-right font-mono font-bold text-sm"
                                     />
                                  </div>
                               </td>
                               <td className="px-6 text-right font-mono font-bold text-sm text-foreground">
                                  ${item.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                              </td>
+                              <td className="px-4 text-center">
+                                 <Button 
+                                   variant="ghost" 
+                                   size="icon" 
+                                   onClick={() => handleLineItemRemove(activeVendorIndex, idx)}
+                                   className="h-8 w-8 text-muted-foreground/20 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                                 >
+                                    <Trash2 size={14} />
+                                 </Button>
                               </td>
                            </tr>
                         ))}
